@@ -1,0 +1,84 @@
+# NOTE: This repository is public. All workflow output (logs, command echoes,
+# unzip/grep listings) is world-readable. Any future use of `secrets.*` MUST be
+# paired with GitHub Actions secret-masking and the most restrictive
+# `permissions:` block possible. Avoid `set -x`, `env`, `printenv`, and naked
+# `echo "$VAR"` of any value derived from secrets.
+name: Unit Tests
+
+on:
+  push:
+    branches: [main, develop, release]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@ad2b38190b15e4d6bdf0c97fb4fca8412226d287 # v5.3.0
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+
+      - name: Build debug APKs (all flavors)
+        run: ./gradlew assembleDebug
+
+      - name: Run unit tests (all flavors)
+        run: ./gradlew test
+
+      - name: Run lint (all flavors)
+        run: ./gradlew lintFdroidDebug lintGplayDebug
+
+      - name: Build release APKs (for tooling-leak guard, all flavors)
+        run: ./gradlew assembleRelease
+
+      - name: Verify release APKs have no debug tooling classes
+        run: |
+          set -euo pipefail
+          found=0
+          for apk in app/build/outputs/apk/*/release/*.apk; do
+            [ -f "$apk" ] || continue
+            found=1
+            echo "Scanning $apk"
+            # 1) Entry-name guard
+            leaks=$(unzip -l "$apk" \
+              | grep -Ei '(ui-tooling|ui-test-manifest|leakcanary|androidx/test)' \
+              | grep -vF 'ui-tooling-preview' || true)
+            # 2) DEX-class guard (catches leaks that survive R8 minification)
+            class_leaks=$(unzip -p "$apk" 'classes*.dex' \
+              | strings -a \
+              | grep -E 'androidx/compose/ui/tooling/[^p]|androidx/compose/ui/test/manifest|leakcanary|androidx/test/' \
+              || true)
+            if [ -n "$leaks" ] || [ -n "$class_leaks" ]; then
+              echo "::error::Release APK contains debug tooling artifacts in $apk"
+              echo "$leaks"
+              echo "$class_leaks"
+              exit 1
+            fi
+          done
+          if [ "$found" -eq 0 ]; then
+            echo "::error::No release APK found"
+            exit 1
+          fi
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: test-results
+          path: |
+            app/build/reports/tests/
+            app/build/reports/lint-results-*.html

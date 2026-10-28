@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Clock ring segment 1: ~7:30 to ~1:30 (before right arm cutout) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M39,73 A25,25 0 1 1 72,36" />
+    <!-- Tick at 12 o'clock -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M54,29L54,34" />
+    <!-- Tick at 9 o'clock -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M29,54L34,54" />
+    <!-- Figure: head -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M63,44m-4.5,0a4.5,4.5 0,1,1 9,0a4.5,4.5 0,1,1 -9,0" />
+    <!-- Figure: body -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M63,55L63,64" />
+    <!-- Figure: left arm raised -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M63,56L51,44" />
+    <!-- Figure: right arm raised -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M63,56L75,44" />
+    <!-- Desk: surface -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M46,69L80,69" />
+    <!-- Desk: surface between legs -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M49,71L77,71" />
+    <!-- Desk: left leg -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M49,70L49,80" />
+    <!-- Desk: right leg -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M77,70L77,80" />
+</vector>
